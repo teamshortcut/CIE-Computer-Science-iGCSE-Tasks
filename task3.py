@@ -161,7 +161,7 @@ def printNames():
         print(str(i)+"\n"+names[i]+str(paid[i]))
 
 #Outputs each line of both lists
-def calculateCosts():
+def calculateCosts(cost, originalNumStudents):
     #Stores the contents of the file used to store student records in variables
     paidStorage = open("listPaid.txt", "r+")
     paid = paidStorage.readlines()
@@ -171,34 +171,13 @@ def calculateCosts():
     #Variable for the number of students who have payed, from the checkPayed function
     numPayed = checkPayed()
 
-    #Asks whether to charge the minimum cost, or the recommended cost
-    minimum = input("Would you like to charge the minimum price (£"+str(calculateTotal(numberOfStudents))+") or the recommended price? (£"+str(math.ceil(calculateTotal(numberOfStudents)*1.2))+") (m or r) ")
-    #Variable for the modifyer, depending on the result of the question
-    modifyer = 1
-    runMin = True
-    while runMin == True:
-        #Checks whether the user chose to use the minimum or recommended price
-        if minimum == "m" or minimum == "M":
-            print("Minimum price chosen.")
-            #Assigns 1 to the modifyer (keeping the prices the same) and ends the loop
-            modifyer = 1
-            runMin = False
-        elif minimum == "r" or minimum == "R":
-            print("Recommended price chosen.")
-            #Assigns 1.2 to the modifyer (raising the prices by 20%) and ends the loop
-            modifyer = 1.2
-            runMin = False
-        else:
-            print("Not a valid input.")
-            runMin = True
-
     #Outputs the number of students who have payed
-    print(str(numPayed)+" out of "+(str(len(paid)))+" people have paid.")
+    print(str(numPayed)+" out of "+(str(len(paid)))+", from your original "+str(originalNumStudents)+", students have paid.")
 
     #Variables for the total that is needed, the cost per student and the amount that has been collected
     total = int(calculateTotal(numberOfStudents) * numberOfStudents)
-    costPerStudent = int(calculateTotal(numberOfStudents))
-    collected = math.ceil(int(calculateTotal(numberOfStudents) * numPayed * modifyer))
+    costPerStudent = int(cost)
+    collected = math.ceil(cost * numPayed)
 
     #Outputs the amount collected
     print("So far you have collected £"+(str(collected))+" in total, out of the £"+str(total)+" that you need.")
@@ -270,57 +249,63 @@ if len(paid) != len(names):
         else:
             print("Not a valid input.")
             runError = True
-#If there are no student records yet inputted, runs the addNames function so the user can input the student records.
-elif len(names) == 0:
-    y = True
-    while y == True:
-        #Input for the number of students
-        numberOfStudents = input("Please enter the number of students taking part: ")
-        #Checks if input is a number
-        if numberOfStudents.isdigit():
-            #Checks if input is in the correct range.
-            if int(numberOfStudents) < 1 or int(numberOfStudents) > 45:
-                y = True
-                print("That's not a valid number, please try again.")
-            else:
-                y = False
-                print("Number accepted. There are "+str(numberOfStudents)+" students.")
-        else:
+
+numberOfStudents = 0
+y = True
+while y == True:
+    #Input for the number of students
+    numberOfStudents = input("Please enter the number of students taking part: ")
+    #Checks if input is a number
+    if numberOfStudents.isdigit():
+        #Checks if input is in the correct range.
+        if int(numberOfStudents) < 1 or int(numberOfStudents) > 45:
             y = True
             print("That's not a valid number, please try again.")
-    #Outputs the cost per student
-    print("The minimum cost per student for "+str(numberOfStudents)+" students will be: "+(str(calculateTotal(numberOfStudents))))
-    print("The recommended cost per student for "+str(numberOfStudents)+" students will be: "+(str(math.ceil(calculateTotal(numberOfStudents)*1.2))))
-    print("Now please enter the values for the student records.")
-    addNames()
-else:
-    print("")
+        else:
+            y = False
+            print("Number accepted. There are "+str(numberOfStudents)+" students.")
+    else:
+        y = True
+        print("That's not a valid number, please try again.")
+#Outputs the cost per student
+minCost = calculateTotal(numberOfStudents)
+recCost = math.ceil(calculateTotal(numberOfStudents)*1.2)
+
+print("The minimum cost per student for "+str(numberOfStudents)+" students will be: "+(str(minCost)))
+print("The recommended cost per student for "+str(numberOfStudents)+" students will be: "+(str(math.ceil(recCost))))
+
+runMin = True
+while runMin == True:
+    cost = input("Would you like to charge the minimum price (£"+str(calculateTotal(numberOfStudents))+") or the recommended price? (£"+str(math.ceil(calculateTotal(numberOfStudents)*1.2))+") (m or r) ")
+    #Checks whether the user chose to use the minimum or recommended price
+    if cost == "m" or cost == "M":
+        print("Minimum price chosen.")
+        #Chooses the minimum cost and ends the loop
+        cost = minCost
+        runMin = False
+    elif cost == "r" or cost == "R":
+        print("Recommended price chosen.")
+        #Chooses the recommended cost and ends the loop
+        cost = recCost
+        runMin = False
+    else:
+        print("Not a valid input.")
+        runMin = True
 
 while run == True:
+    #If there are no student records yet inputted, runs the addNames function so the user can input the student records.
+    namesStorage = open("listNames.txt", "r+")
+    names = namesStorage.readlines()
+    namesStorage.close()
+    if len(names) == 0:
+        print("There are currently 0 student records; please enter at least one student.")
+        addNames()
+    else:
+       print("")
     #Input for what the user would like to do
-    userInput = input("What would you like to do? (C)alculate theoretical values, (V)erify how many have payed and view costs, (I)nput student values, (D)elete student values, (P)rint them or (Q)uit? ")
-    if str(userInput) == "c" or str(userInput) == "C":
-        y = True
-        while y == True:
-            #Input for the number of students
-            numberOfStudents = input("Please enter the number of students taking part: ")
-            #Checks if input is a number
-            if numberOfStudents.isdigit():
-                #Checks if input is in the correct range.
-                if int(numberOfStudents) < 1 or int(numberOfStudents) > 45:
-                    y = True
-                    print("That's not a valid number, please try again.")
-                else:
-                    y = False
-                    print("Number accepted. There are "+str(numberOfStudents)+" students.")
-            else:
-                y = True
-                print("That's not a valid number, please try again.")
-        #Outputs the costs per student
-        print("Minimum cost per student: "+(str(calculateTotal(numberOfStudents))))
-        print("Recommended cost per student: "+(str(math.ceil(calculateTotal(numberOfStudents)*1.2))))
-    elif str(userInput) == "v" or str(userInput) == "V":
-        print(calculateCosts())
+    userInput = input("What would you like to do? (V)erify how many have payed and view costs, (I)nput student values, (D)elete student values, (P)rint them or (Q)uit? ")
+    if str(userInput) == "v" or str(userInput) == "V":
+        print(calculateCosts(cost, numberOfStudents))
     elif str(userInput) == "i" or str(userInput) == "I":
         addNames()
     elif str(userInput) == "d" or str(userInput) == "D":
