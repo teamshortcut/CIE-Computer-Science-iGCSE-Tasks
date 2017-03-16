@@ -185,11 +185,11 @@ def calculateCosts(cost, originalNumStudents):
     #Works out and assigns to a variable whether they have broken even, made a profit or a loss.
     message = ""
     if total - collected < 0:
-        message = "make a profit."
+        message = "make a profit of £"+str(abs(collected-total))
     elif total - collected == 0:
         message = "break even."
     elif total - collected > 0:
-        message = "make a loss."
+        message = "make a loss of £"+str(abs(collected-total))
     else:
         message = "[ERROR]"
 
